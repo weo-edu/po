@@ -49,6 +49,17 @@ function Po() {
 }
 
 /**
+ * Helper for running and array of punks in series
+ *
+ * @param {Array} pipeline
+ * @return {Po}
+ */
+
+Po.pipeline = function(pipeline) {
+  return Po.apply(null, pipeline);
+};
+
+/**
  * Turns a function into a thenable.
  *     
  * @param  {Function} fn 
