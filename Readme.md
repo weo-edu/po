@@ -64,6 +64,7 @@ po([
 ])().then(function(responses) {
   //...
 });
+```
 
 ### Parallel Object
 
