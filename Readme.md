@@ -1,3 +1,5 @@
+[ ![Codeship Status for weo-edu/po](https://codeship.com/projects/aacf3bb0-d594-0132-a9ce-26dfd4cc1a97/status?branch=master)](https://codeship.com/projects/78124)
+
 Po is simplified version of [Vo](https://github.com/lapwinglabs/po) that has a promise centric api.
 
 ## Features
