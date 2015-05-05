@@ -1,0 +1,27 @@
+{
+  "name": "po",
+  "description": "promise flow",
+  "repository": "weo-edu/po",
+  "version": "0.1.0",
+  "keywords": [],
+  "files": [
+    "index.js"
+  ],
+  "dependencies": {
+    "foreach": "~2.0.5",
+    "sliced": "0.0.5",
+    "es6-promise": "~2.1.1"
+  },
+  "devDependencies": {
+    "jshint": "^2.6.3",
+    "mocha": "^2.2.1",
+    "no-iits": "0.0.0"
+  },
+  "scripts": {
+    "test": "make test"
+  },
+  "engines": {
+    "node": "~0.10.38"
+  },
+  "license": "MIT"
+}
