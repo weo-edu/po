@@ -43,7 +43,7 @@ po(function(url) {
 ```js
 var request = require('superagent-promise');
 var po = require('po');
-var db = {};
+var db = require('ioredis');
 
 function get(url) {
   return request('get', url).end();
@@ -66,7 +66,7 @@ var request = require('superagent-promise');
 var po = require('po');
 
 function get(url) {
-  return request('get', url).end;
+  return request('get', url).end();
 }
 
 po([
@@ -84,7 +84,7 @@ var request = require('superagent-promise');
 var po = require('po');
 
 function get(url) {
-  return request('get', url).end;
+  return request('get', url).end();
 }
 
 po({
@@ -123,7 +123,7 @@ po({
 
 ### Currying
 
-Po returns an auto currying punk. The actual pipeline will not be started until then is called.
+Po returns an auto currying punk. The actual pipeline will not be started until `then` is called.
 
 ```js
 var request = require('superagent-promise');
