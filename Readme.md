@@ -13,6 +13,17 @@ $ npm install po
 
 ## Usage
 
+### Punk
+
+A punk is po's atom. It's a function that takes a single argument and returns a promise. Po takes punks as args and returns a punk.
+
+```js
+
+function punk(arg) {
+  return Promise.resolve(arg);
+}
+```
+
 ### Basic
 
 ```js
@@ -60,7 +71,7 @@ function get(url) {
 
 po([
   get('https://weo.io'),
-  get('https://google.com)
+  get('https://google.com')
 ])().then(function(responses) {
   //...
 });
@@ -78,7 +89,7 @@ function get(url) {
 
 po({
   weo: get('https://weo.io'),
-  google: get('https://google.com)
+  google: get('https://google.com')
 })().then(function(responses) {
   // `responses` is object
 });
