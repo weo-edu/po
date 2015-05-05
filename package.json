@@ -2,7 +2,7 @@
   "name": "@weo-edu/po",
   "description": "promise flow",
   "repository": "weo-edu/po",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "keywords": [],
   "files": [
     "index.js"
