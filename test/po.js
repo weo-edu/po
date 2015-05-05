@@ -2,7 +2,7 @@
  * Module Dependencies
  */
 
-var Promise = require('es6-promise').Promise;
+var Promise = require('native-promise-only');
 var assert = require('assert');
 var Po = require('..');
 
@@ -62,39 +62,6 @@ describe('promises: po(promise)', function() {
   })
 });
 
-
-// TODO: add generator support
-/*
-describe('generators: po(*fn)', function() {
-  it('should work with generators', function(done) {
-    function *gen(a, b) {
-      assert.equal(a, 'a');
-      assert.equal(b, 'b');
-      return yield timeout(50);
-    }
-
-    Po(gen)('a', 'b', function(err, v) {
-      if (err) return done(err);
-      assert.equal(v, 50);
-      done();
-    });
-  })
-
-  it('should catch thrown errors', function() {
-    function *gen(a, b) {
-      assert.equal(a, 'a');
-      assert.equal(b, 'b');
-      throw new Error('some error');
-      return a + b;
-    }
-
-    Po(gen)('a', 'b', function(err, v) {
-      assert.equal('some error', err.message);
-      assert.equal(undefined, v);
-      done();
-    });
-  })
-});*/
 
 describe('series: po(fn, ...)', function() {
   it('should run in series', function(done) {
@@ -173,7 +140,7 @@ describe('arrays: po([...])', function() {
   it('should run an array of functions in parallel', function(done) {
     var o = [];
 
-    Po([to(50, o), to(150, o), to(100, o)])().then(function(v) {
+    Po([to(50, o), to(150, o), to(100, o)]).then(function(v) {
       assert.deepEqual([50, 150, 100], v);
       assert.deepEqual([50, 100, 150], o);
       done();
@@ -184,7 +151,7 @@ describe('arrays: po([...])', function() {
   it('should handle errors', function(done) {
     var o = [];
 
-    Po([to(50, o), to(0, o), to(100, o)])().catch(function(err) {
+    Po([to(50, o), to(0, o), to(100, o)]).catch(function(err) {
       assert.equal('no ms present', err.message);
       done();
     });
@@ -205,7 +172,7 @@ describe('objects: po({...})', function() {
   it('should run an object of functions in parallel', function(done) {
     var o = [];
 
-    Po({ a: to(50, o), b: to(150, o), c: to(100, o) })().then(function(v) {
+    Po({ a: to(50, o), b: to(150, o), c: to(100, o) }).then(function(v) {
       assert.deepEqual(v, {
         a: 50,
         b: 150,
@@ -220,7 +187,7 @@ describe('objects: po({...})', function() {
   it('should catch any errors', function(done) {
     var o = [];
 
-    Po({ a: to(50, o), b: to(150, o), c: to(0, o) })().catch(function(err) {
+    Po({ a: to(50, o), b: to(150, o), c: to(0, o) }).catch(function(err) {
       assert.equal('no ms present', err.message);
       done();
     })
@@ -266,11 +233,11 @@ describe('composition: po(po(...), [po(...), po(...)])', function() {
     var a = Po([to(50, o), to(150, o)]);
     var b = Po([to(100, o), to(200, o)]);
 
-    Po([a, b])().then(function(v) {
+    Po([a, b]).then(function(v) {
       assert.deepEqual([[50, 150], [100, 200]], v);
       assert.deepEqual([50, 100, 150, 200], o);
       done();
-    });
+    }).catch(console.error);
   })
 
   it('should support async composition with objects', function(done) {
@@ -287,7 +254,7 @@ describe('composition: po(po(...), [po(...), po(...)])', function() {
     var a = Po({ a1: to(50, o), a2: to(150, o) });
     var b = Po({ b1: to(100, o), b2: to(200, o) });
 
-    Po({ c1: a, c2: b })().then(function(v) {
+    Po({ c1: a, c2: b }).then(function(v) {
       assert.deepEqual(v, {
         c1: {
           a1: 50,
@@ -304,6 +271,70 @@ describe('composition: po(po(...), [po(...), po(...)])', function() {
     });
   });
 
+  it('should support curry composition', function(done) {
+    function to(ms, arr) {
+      return promise_timeout(ms).then(function(v) {
+        arr.push(v);
+        return v;
+      });
+    }
+
+    function addTen(v) {
+      return 10 + v;
+    }
+
+    var addTenTo = Po(to, addTen);
+    var addTenToOne = addTenTo(1);
+
+    var o1 = [];
+    var o2 = [];
+
+    Po({
+      1: addTenToOne(o1),
+      2: addTenTo(6, o2)
+    }).then(function(res) {
+      assert.equal(res[1], 11);
+      assert.equal(res[2], 16);
+      assert.deepEqual(o1, [1]);
+      assert.deepEqual(o2, [6]);
+      done();
+
+    });
+
+  });
+
+  it('should suport parallel curry composition', function(done) {
+    function get(url, body) {
+      return promise_timeout(1, url).then(function(url) {
+        return {url: url, body: body};
+      });
+    }
+
+    function enrich(res) {
+      res.enriched = true;
+      return res;
+    }
+
+    var enrichGet = Po(get, enrich);
+
+    Po({
+      weo: enrichGet('weo.io'),
+      google: enrichGet('google.com')
+    })('test').then(function(res) {
+      assert.deepEqual(res.weo, {
+        url: 'weo.io',
+        body: 'test',
+        enriched: true
+      });
+      assert.deepEqual(res.google, {
+        url: 'google.com',
+        body: 'test',
+        enriched: true
+      });
+      done();
+    })
+  })
+
   it('should propagate errors', function(done) {
     function to(ms, arr) {
       return function() {
@@ -318,7 +349,7 @@ describe('composition: po(po(...), [po(...), po(...)])', function() {
     var a = Po({ a1: to(50, o), a2: to(0, o) });
     var b = Po({ b1: to(100, o), b2: to(200, o) });
 
-    Po({ c1: a, c2: b })().catch(function(err) {
+    Po({ c1: a, c2: b }).catch(function(err) {
       assert.equal('no ms present', err.message);
       done();
     });
