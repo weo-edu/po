@@ -1,5 +1,5 @@
 {
-  "name": "po",
+  "name": "@weo-edu/po",
   "description": "promise flow",
   "repository": "weo-edu/po",
   "version": "0.1.0",
@@ -10,7 +10,6 @@
   "dependencies": {
     "es6-promise": "~2.1.1",
     "foreach": "~2.0.5",
-    "native-promise-only": "^0.7.8-a",
     "sliced": "0.0.5"
   },
   "devDependencies": {
