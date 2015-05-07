@@ -125,7 +125,7 @@ po({
 
 ### Currying
 
-Po returns an auto currying punk. The arity of a po instance is defined by the arity of the first punk in the pipeline. The po pipeline is not actually executed until sufficient args are passed. 
+Po returns an auto currying punk. The arity of a po pipeline is defined by the arity of the first punk in the pipeline. The po pipeline is not actually executed until sufficient args are passed. 
 
 In the example below `req` has an arity of 2, and `weoGoogle` has an arity of 1. 
 
