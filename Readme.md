@@ -125,7 +125,9 @@ po({
 
 ### Currying
 
-Po returns an auto currying punk. The actual pipeline will not be started until `then` is called.
+Po returns an auto currying punk. The arity of a po instance is defined by the arity of the first punk in the pipeline. The po pipeline is not actually executed until sufficient args are passed. 
+
+In the example below `req` has an arity of 2, and `weoGoogle` has an arity of 1. 
 
 ```js
 var request = require('superagent-promise');
@@ -143,10 +145,12 @@ function title(res) {
 
 var req = po(get, title);
 
-po({
+var weoGoole = po({
   weo: req('http://weo.io'),
   google: req('http://google.com')
-})({limit: 10}).then(function(res) {
+});
+
+weoGoole({limit: 10}).then(function(res) {
   // `res` is an object containing the text of 10 titles for each site
 })
 ```
