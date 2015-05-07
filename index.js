@@ -51,6 +51,14 @@ function Po(arityPunk) {
   return generator([]);
 }
 
+
+/**
+ * Get arity of `v`
+ * 
+ * @param  {Mixed} v
+ * @return {Number}
+ */
+
 function getArity(v) {
   var t = type(v);
 
