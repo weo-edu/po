@@ -74,7 +74,7 @@ function get(url) {
 po([
   get('https://weo.io'),
   get('https://google.com')
-]).then(function(responses) {
+])().then(function(responses) {
   //...
 });
 ```
@@ -92,7 +92,7 @@ function get(url) {
 po({
   weo: get('https://weo.io'),
   google: get('https://google.com')
-}).then(function(responses) {
+})().then(function(responses) {
   // `responses` is object
 });
 ```
@@ -118,7 +118,7 @@ var req = po(get, title);
 po({
   weo: req('http://weo.io'),
   google: req('http://google.com')
-}).then(function(res) {
+})().then(function(res) {
   // `res` is an object containing each title
 })
 ```

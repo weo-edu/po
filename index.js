@@ -29,56 +29,44 @@ module.exports = Po;
  * @return {Punk}
  */
 
-function Po() {
+function Po(arityPunk) {
   var pipeline = sliced(arguments).map(resolve);
+  var arity = getArity(arityPunk);
+
   if (!pipeline.length)
     throw new Error('At least one argument required');
 
   function generator(args) {
-    function po(arg) {
-      if (isUndefined(arg))
-        return po;
-      return generator(args.concat(sliced(arguments)));
+    function po() {
+      var lArgs = args.concat(sliced(arguments))
+      if (lArgs.length >= arity)
+        return series(pipeline, lArgs);
+      else
+        return generator(lArgs);
     }
-    return thenify(po, function() {
-      return series(pipeline, args);
-    });
+    po.length = arity - args.length;
+    return po;
   }
   
   return generator([]);
 }
 
-/**
- * Helper for running and array of punks in series
- *
- * @param {Array} pipeline
- * @return {Po}
- */
+function getArity(v) {
+  var t = type(v);
 
-Po.pipeline = function(pipeline) {
-  return Po.apply(null, pipeline);
-};
-
-/**
- * Turns a function into a thenable.
- *     
- * @param  {Function} fn 
- * @param  {Punk}   punk
- * @return {Function}
- */
-
-function thenify(fn, punk) {
-  fn.then = function(resolve, reject) {
-    return punk().then(resolve, reject);
-  };
-
-  fn.catch = function(reject) {
-    return punk().catch(reject);
-  };
-
-  return fn;
+  switch(t) {
+    case 'function':
+      return v.length;
+    case 'array':
+      return getArity(v[0]);
+    case 'object':
+      return getArity(v[keys(v)[0]]);
+    case 'string':
+      return parseInt(v);
+    default:
+      return v;
+  }
 }
-
 
 /**
  * Resolve pipeline arg into a punk
@@ -150,7 +138,7 @@ function parallel(obj) {
           default:
             fn = function() {return v};
         }
-        a.push(v.apply(null, args));
+        a.push(fn.apply(null, args));
       });
 
       Promise.all(a).then(function(val) {

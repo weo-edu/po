@@ -50,7 +50,7 @@ describe('promises: po(promise)', function() {
   });
 
   it('should handle errors', function(done) {
-    function async(a,fn) {
+    function async(a) {
       assert.equal(a, 'a');
       return promise_timeout(1, new Error('some error'));
     }
@@ -95,7 +95,7 @@ describe('series: po(fn, ...)', function() {
   it('should handle errors', function(done) {
     var o = [];
 
-    function a(a, b) {
+    function a(a) {
       o.push('a');
       assert.equal('a', a);
       return 'a';
@@ -140,7 +140,7 @@ describe('arrays: po([...])', function() {
   it('should run an array of functions in parallel', function(done) {
     var o = [];
 
-    Po([to(50, o), to(150, o), to(100, o)]).then(function(v) {
+    Po([to(50, o), to(150, o), to(100, o)])().then(function(v) {
       assert.deepEqual([50, 150, 100], v);
       assert.deepEqual([50, 100, 150], o);
       done();
@@ -151,7 +151,7 @@ describe('arrays: po([...])', function() {
   it('should handle errors', function(done) {
     var o = [];
 
-    Po([to(50, o), to(0, o), to(100, o)]).catch(function(err) {
+    Po([to(50, o), to(0, o), to(100, o)])().catch(function(err) {
       assert.equal('no ms present', err.message);
       done();
     });
@@ -172,7 +172,7 @@ describe('objects: po({...})', function() {
   it('should run an object of functions in parallel', function(done) {
     var o = [];
 
-    Po({ a: to(50, o), b: to(150, o), c: to(100, o) }).then(function(v) {
+    Po({ a: to(50, o), b: to(150, o), c: to(100, o) })().then(function(v) {
       assert.deepEqual(v, {
         a: 50,
         b: 150,
@@ -187,7 +187,7 @@ describe('objects: po({...})', function() {
   it('should catch any errors', function(done) {
     var o = [];
 
-    Po({ a: to(50, o), b: to(150, o), c: to(0, o) }).catch(function(err) {
+    Po({ a: to(50, o), b: to(150, o), c: to(0, o) })().catch(function(err) {
       assert.equal('no ms present', err.message);
       done();
     })
@@ -233,7 +233,7 @@ describe('composition: po(po(...), [po(...), po(...)])', function() {
     var a = Po([to(50, o), to(150, o)]);
     var b = Po([to(100, o), to(200, o)]);
 
-    Po([a, b]).then(function(v) {
+    Po([a, b])().then(function(v) {
       assert.deepEqual([[50, 150], [100, 200]], v);
       assert.deepEqual([50, 100, 150, 200], o);
       done();
@@ -254,7 +254,7 @@ describe('composition: po(po(...), [po(...), po(...)])', function() {
     var a = Po({ a1: to(50, o), a2: to(150, o) });
     var b = Po({ b1: to(100, o), b2: to(200, o) });
 
-    Po({ c1: a, c2: b }).then(function(v) {
+    Po({ c1: a, c2: b })().then(function(v) {
       assert.deepEqual(v, {
         c1: {
           a1: 50,
@@ -284,19 +284,16 @@ describe('composition: po(po(...), [po(...), po(...)])', function() {
     }
 
     var addTenTo = Po(to, addTen);
-    var addTenToOne = addTenTo(1);
 
     var o1 = [];
-    var o2 = [];
 
     Po({
-      1: addTenToOne(o1),
-      2: addTenTo(6, o2)
-    }).then(function(res) {
-      assert.equal(res[1], 11);
-      assert.equal(res[2], 16);
-      assert.deepEqual(o1, [1]);
-      assert.deepEqual(o2, [6]);
+      1: addTenTo(5),
+      2: addTenTo(50)
+    })(o1).then(function(res) {
+      assert.equal(res[1], 15);
+      assert.equal(res[2], 60);
+      assert.deepEqual(o1, [5, 50]);
       done();
 
     });
@@ -349,7 +346,7 @@ describe('composition: po(po(...), [po(...), po(...)])', function() {
     var a = Po({ a1: to(50, o), a2: to(0, o) });
     var b = Po({ b1: to(100, o), b2: to(200, o) });
 
-    Po({ c1: a, c2: b }).catch(function(err) {
+    Po({ c1: a, c2: b })().catch(function(err) {
       assert.equal('no ms present', err.message);
       done();
     });
